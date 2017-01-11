@@ -1,0 +1,151 @@
+*======================================================================
+*
+* The following coding has been generated. Please do not change
+* manually. All modifications will be lost by new generation.
+*
+* The code generation was triggered by
+*
+* Name  : DDIC
+* Date  : 03.05.2012
+* Time  : 13:53:10
+*
+*======================================================================
+*--------------------------------------------------------------------*
+*      Form  DIRECT_BILLING
+*--------------------------------------------------------------------*
+FORM DRBODL_PRZ_DIRECT_BILLING
+  USING
+    UV_PROCESS_MODE   TYPE BEA_PROCESS_MODE
+  CHANGING
+    CT_RETURN         TYPE BEAT_RETURN.
+
+ CONSTANTS:
+   LC_BILLDIRECT_INT TYPE BEA_DIRECT_BILLING  VALUE 'A',
+   LC_BILLDIRECT_EXT TYPE BEA_DIRECT_BILLING  VALUE 'B'.
+  DATA:
+    LT_DLI_WRK        TYPE /1BEA/T_CRMB_DLI_WRK,
+    LT_RETURN         TYPE BEAT_RETURN.
+
+* Check if direct billing is relevant at all
+  READ TABLE GT_DLI_WRK WITH KEY DIRECT_BILLING = LC_BILLDIRECT_INT
+                        TRANSPORTING NO FIELDS.
+  IF SY-SUBRC <> 0.
+    READ TABLE GT_DLI_WRK WITH KEY DIRECT_BILLING = LC_BILLDIRECT_EXT
+                          TRANSPORTING NO FIELDS.
+  ENDIF.
+  CHECK SY-SUBRC = 0.
+
+  LT_DLI_WRK = GT_DLI_WRK.
+
+  DELETE LT_DLI_WRK WHERE DIRECT_BILLING IS INITIAL OR
+                          NOT INCOMP_ID IS INITIAL OR
+                          NOT BILL_BLOCK IS INITIAL OR
+                          UPD_TYPE NE GC_INSERT OR
+                          BILL_STATUS NE GC_BILLSTAT_TODO.
+
+  CHECK LT_DLI_WRK IS NOT INITIAL.
+
+  CALL FUNCTION '/1BEA/CRMB_BD_O_CREATE'
+    EXPORTING
+      IT_DLI_WRK        = LT_DLI_WRK
+      IV_PROCESS_MODE   = UV_PROCESS_MODE
+      IV_COMMIT_FLAG    = GC_NOCOMMIT
+      IV_DLI_DB         = GC_TRUE
+    IMPORTING
+       ET_RETURN         = LT_RETURN.
+
+  APPEND LINES OF LT_RETURN TO CT_RETURN.
+
+  PERFORM AL_WRITE USING    LT_RETURN
+                   CHANGING CT_RETURN.
+
+ENDFORM.                    " DIRECT_BILLING
+*---------------------------------------------------------------------
+*       FORM al_write
+*---------------------------------------------------------------------
+FORM AL_WRITE
+  USING
+    UT_RETURN     TYPE BEAT_RETURN
+  CHANGING
+    CT_RETURN     TYPE BEAT_RETURN.
+
+DATA:
+  LS_RETURN        TYPE BEAS_RETURN,
+  LT_RETURN        TYPE BEAT_RETURN,
+  LV_EXTNUMBER     TYPE BALNREXT,
+  LV_EXTNUMBER_HLP TYPE BALNREXT,
+  LV_LOGHNDL       TYPE BALLOGHNDL,
+  LV_LOGHNDL_HLP   TYPE BALLOGHNDL,
+  LV_DLI_GUID      TYPE BEA_DLI_GUID,
+  LS_DLI_WRK       TYPE /1BEA/S_CRMB_DLI_WRK.
+
+LOOP AT UT_RETURN INTO LS_RETURN WHERE CONTAINER = 'DLI'.
+  WRITE LS_RETURN-LOGSYS TO LV_EXTNUMBER_HLP.
+  CONCATENATE LV_EXTNUMBER LV_EXTNUMBER_HLP INTO LV_EXTNUMBER.
+  WRITE LS_RETURN-OBJTYPE TO LV_EXTNUMBER_HLP.
+  CONCATENATE LV_EXTNUMBER LV_EXTNUMBER_HLP INTO LV_EXTNUMBER.
+  WRITE LS_RETURN-SRC_HEADNO TO LV_EXTNUMBER_HLP.
+  CONCATENATE LV_EXTNUMBER LV_EXTNUMBER_HLP INTO LV_EXTNUMBER.
+  WRITE LS_RETURN-SRC_ITEMNO TO LV_EXTNUMBER_HLP.
+  CONCATENATE LV_EXTNUMBER LV_EXTNUMBER_HLP INTO LV_EXTNUMBER.
+  IF LV_EXTNUMBER <> LV_EXTNUMBER_HLP.
+    LV_DLI_GUID = LS_RETURN-OBJECT_GUID_C.
+    CALL FUNCTION 'BEA_AL_O_CREATE'
+      EXPORTING
+        IV_APPL            = GC_APPL
+        IV_DLI_GUID        = LV_DLI_GUID
+        IV_EXTNUMBER       = LV_EXTNUMBER
+      IMPORTING
+        EV_LOGHNDL         = LV_LOGHNDL
+      EXCEPTIONS
+        LOG_ALREADY_EXISTS = 1
+        LOG_NOT_CREATED    = 2
+        OTHERS             = 3.
+    IF SY-SUBRC <> 0.
+      MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+              WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4
+              INTO GV_DUMMY.
+      READ TABLE GT_DLI_WRK INTO LS_DLI_WRK
+                            WITH KEY DLI_GUID = LS_RETURN-OBJECT_GUID_C.
+      CALL FUNCTION '/1BEA/CRMB_DL_O_MESSAGE_ADD'
+        EXPORTING
+          IV_CONTAINER   = 'DLI'
+          IS_DLI_WRK     = LS_DLI_WRK
+          IT_RETURN      = CT_RETURN
+        IMPORTING
+          ET_RETURN      = CT_RETURN.
+      CONTINUE.  " in loop
+    ENDIF.
+    LV_EXTNUMBER_HLP = LV_EXTNUMBER.
+  ENDIF.
+  CLEAR LT_RETURN.
+  APPEND LS_RETURN TO LT_RETURN.
+  CALL FUNCTION 'BEA_AL_O_MSGS_ADD'
+    EXPORTING
+      iv_loghndl   = lv_loghndl
+      it_return    = lt_return
+    EXCEPTIONS
+      error_at_add = 1
+      OTHERS       = 2.
+  IF sy-subrc <> 0.
+    MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+            WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4
+            INTO GV_DUMMY.
+    READ TABLE GT_DLI_WRK INTO LS_DLI_WRK
+                          WITH KEY DLI_GUID = LS_RETURN-OBJECT_GUID_C.
+    CALL FUNCTION '/1BEA/CRMB_DL_O_MESSAGE_ADD'
+      EXPORTING
+        IV_CONTAINER   = 'DLI'
+        IS_DLI_WRK     = LS_DLI_WRK
+        IT_RETURN      = CT_RETURN
+      IMPORTING
+        ET_RETURN      = CT_RETURN.
+  ELSE.
+    IF LV_LOGHNDL <> LV_LOGHNDL_HLP.
+      APPEND LV_LOGHNDL TO GT_LOGHNDL.
+      LV_LOGHNDL_HLP = LV_LOGHNDL.
+    ENDIF.
+  ENDIF.
+ENDLOOP.
+
+ENDFORM.                    " AL_WRITE

@@ -1,0 +1,63 @@
+constants: begin of gc_partner_pft,
+       undefinded                   type comt_partner_pft value '0000',
+       undefined                    type comt_partner_pft value '0000',
+
+       sold_to                      type comt_partner_pft value '0001',
+       ship_to                      type comt_partner_pft value '0002',
+       bill_to                      type comt_partner_pft value '0003',
+       payer                        type comt_partner_pft value '0004',
+       employee                     type comt_partner_pft value '0005',
+       contact_partner              type comt_partner_pft value '0006',
+       contact_person               type comt_partner_pft value '0007',
+       responsible                  type comt_partner_pft value '0008',
+       competitor                   type comt_partner_pft value '0009',
+       sales_partner                type comt_partner_pft value '0010',
+       bidder                       type comt_partner_pft value '0011',
+       vendor                       type comt_partner_pft value '0012',
+       demander                     type comt_partner_pft value '0013',
+       portal_supplier              type comt_partner_pft value '0014',
+       billing_unit                 type comt_partner_pft value '0015',
+       exec_service_org             type comt_partner_pft value '0016',
+       inbound_delivery_point       type comt_partner_pft value '0017',
+       outbound_delivery_point      type comt_partner_pft value '0018',
+       release_partner              type comt_partner_pft value '0019',
+       alternative_payer            type comt_partner_pft value '0020',
+       payee                        type comt_partner_pft value '0021',
+       correspondence_recipient     type comt_partner_pft value '0022',
+       dunning_recipient            type comt_partner_pft value '0023',
+       pricing_hierarchy            type comt_partner_pft value '0024',
+       executing_service_employee   type comt_partner_pft value '0025',
+       vendor_proposal              type comt_partner_pft value '0026',
+       buying_center                type comt_partner_pft value '0027',
+       responsible_at_partner       type comt_partner_pft value '0032',
+       end_customer                 type comt_partner_pft value '0033',
+       responsible_organisation     type comt_partner_pft value '0034',
+
+       executing_call_center        type comt_partner_pft value '0028',
+       executing_interaction_center type comt_partner_pft value '0028',
+
+       collateral_provider          type comt_partner_pft value '0029',
+       guarantor                    type comt_partner_pft value '0029',
+
+       sold_from                    type comt_partner_pft value '0030',
+       location                     type comt_partner_pft value '0031',
+
+       remanufacture                type comt_partner_pft value '0035',
+       responsible_for_scrapping    type comt_partner_pft value '0036',
+       location_return              type comt_partner_pft value '0037',
+       supplying_loaction           type comt_partner_pft value '0038',
+       carrier                      type comt_partner_pft value '0040',
+       consolidator                 type comt_partner_pft value '0041',
+
+       causer                       type comt_partner_pft value '0047',
+       supplementary_bill_to        type comt_partner_pft value '0048',
+       planning_account             type comt_partner_pft value '0057',
+       corporate_channel_partner    type comt_partner_pft value '0058',
+
+       validated_account            type comt_partner_pft value '0062',
+       tax_account                  type comt_partner_pft value '0063',
+
+       contract_partner             type comt_partner_pft value '0072',
+       release_ship_to              type comt_partner_pft value '0075'.
+constants: end of gc_partner_pft.
+*

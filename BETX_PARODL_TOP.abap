@@ -1,0 +1,2 @@
+
+include COM_PARTNER_PFT3.

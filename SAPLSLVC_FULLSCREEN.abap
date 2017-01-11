@@ -1,0 +1,51 @@
+*******************************************************************
+*   System-defined Include-files.                                 *
+*******************************************************************
+  INCLUDE LSLVC_FULLSCREENTOP.               " Global Data
+  INCLUDE LSLVC_FULLSCREENUXX.               " Global Data
+
+*******************************************************************
+*   User-defined Include-files (if necessary).                    *
+*******************************************************************
+
+INCLUDE LSLVC_FULLSCREENO01.
+
+INCLUDE LSLVC_FULLSCREENI01.
+
+INCLUDE LSLVC_FULLSCREENF01.
+
+INCLUDE LSLVC_FULLSCREENF02.
+
+INCLUDE LSLVC_FULLSCREENF03.
+
+INCLUDE LSLVC_FULLSCREENF04.
+
+INCLUDE LSLVC_FULLSCREENO02.
+
+INCLUDE LSLVC_FULLSCREENI02.
+
+INCLUDE LSLVC_FULLSCREENF05.
+
+INCLUDE LSLVC_FULLSCREENF06.
+
+INCLUDE LSLVC_FULLSCREENF07.
+
+INCLUDE LSLVC_FULLSCREENF08.
+
+INCLUDE LSLVC_FULLSCREENF09.
+
+INCLUDE LSLVC_FULLSCREENF10.
+
+INCLUDE LSLVC_FULLSCREENF11.
+
+INCLUDE LSLVC_FULLSCREENF12.
+
+INCLUDE LSLVC_FULLSCREENF13.
+
+INCLUDE LSLVC_FULLSCREENF14.
+
+INCLUDE LSLVC_FULLSCREENF15.
+
+*INCLUDE LSLVC_FULLSCREENFBO.
+
+INCLUDE LSLVC_FULLSCREENF16.

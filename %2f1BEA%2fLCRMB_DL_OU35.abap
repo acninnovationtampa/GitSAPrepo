@@ -1,0 +1,291 @@
+FUNCTION /1BEA/CRMB_DL_O_DLGETKEYS.
+*"--------------------------------------------------------------------
+*"*"Local Interface:
+*"  IMPORTING
+*"     REFERENCE(IV_AUTH_CHECK_DLI) TYPE  BEA_BOOLEAN DEFAULT SPACE
+*"     REFERENCE(IV_AUTH_CHECK_BDH) TYPE  BEA_BOOLEAN DEFAULT SPACE
+*"     REFERENCE(IRT_DLI_BDI_GUID) TYPE  BEART_BDI_GUID OPTIONAL
+*"     REFERENCE(IRT_DLI_BILL_BLOCK) TYPE  BEART_BILL_BLOCK OPTIONAL
+*"     REFERENCE(IRT_DLI_BILL_CATEGORY) TYPE  BEART_BILL_CATEGORY
+*"         OPTIONAL
+*"     REFERENCE(IRT_DLI_BILL_DATE) TYPE  BEART_BILL_DATE OPTIONAL
+*"     REFERENCE(IRT_DLI_BILL_ORG) TYPE  BEART_BILL_ORG OPTIONAL
+*"     REFERENCE(IRT_DLI_BILL_RELEVANCE) TYPE  BEART_BILL_RELEVANCE
+*"         OPTIONAL
+*"     REFERENCE(IRT_DLI_BILL_STATUS) TYPE  BEART_BILL_STATUS
+*"         OPTIONAL
+*"     REFERENCE(IRT_DLI_BILL_TYPE) TYPE  BEART_BILL_TYPE OPTIONAL
+*"     REFERENCE(IRT_DLI_CREDIT_DEBIT) TYPE  BEART_CREDIT_DEBIT
+*"         OPTIONAL
+*"     REFERENCE(IRT_DLI_DERIV_CATEGORY) TYPE
+*"                             /1BEA/RT_CRMB_DERIV_CATEGORY OPTIONAL
+*"     REFERENCE(IRT_DLI_DLI_GUID) TYPE  BEART_DLI_GUID OPTIONAL
+*"     REFERENCE(IRT_DLI_INCOMP_ID) TYPE  BEART_INCOMP_ID OPTIONAL
+*"     REFERENCE(IRT_DLI_INVCR_DATE) TYPE  /1BEA/RT_CRMB_INVCR_DATE
+*"         OPTIONAL
+*"     REFERENCE(IRT_DLI_ITEM_CATEGORY) TYPE  BEART_ITEM_CATEGORY
+*"         OPTIONAL
+*"     REFERENCE(IRT_DLI_ITEM_TYPE) TYPE  BEART_ITEM_TYPE OPTIONAL
+*"     REFERENCE(IRT_DLI_LOGSYS) TYPE  /1BEA/RT_CRMB_LOGSYS OPTIONAL
+*"     REFERENCE(IRT_DLI_MAINT_DATE) TYPE  BEART_MAINT_DATE OPTIONAL
+*"     REFERENCE(IRT_DLI_MAINT_TIME) TYPE  BEART_MAINT_TIME OPTIONAL
+*"     REFERENCE(IRT_DLI_MAINT_USER) TYPE  BEART_MAINT_USER OPTIONAL
+*"     REFERENCE(IRT_DLI_OBJTYPE) TYPE  /1BEA/RT_CRMB_OBJTYPE
+*"         OPTIONAL
+*"     REFERENCE(IRT_DLI_PAYER) TYPE  BEART_PAYER OPTIONAL
+*"     REFERENCE(IRT_DLI_P_LOGSYS) TYPE  /1BEA/RT_CRMB_P_LOGSYS
+*"         OPTIONAL
+*"     REFERENCE(IRT_DLI_P_OBJTYPE) TYPE  /1BEA/RT_CRMB_P_OBJTYPE
+*"         OPTIONAL
+*"     REFERENCE(IRT_DLI_P_SRC_HEADNO) TYPE
+*"                             /1BEA/RT_CRMB_P_SRC_HEADNO OPTIONAL
+*"     REFERENCE(IRT_DLI_SOLD_TO_PARTY) TYPE
+*"                             /1BEA/RT_CRMB_SOLD_TO_PARTY OPTIONAL
+*"     REFERENCE(IRT_DLI_SRC_DATE) TYPE  /1BEA/RT_CRMB_SRC_DATE
+*"         OPTIONAL
+*"     REFERENCE(IRT_DLI_SRC_GUID) TYPE  /1BEA/RT_CRMB_SRC_GUID
+*"         OPTIONAL
+*"     REFERENCE(IRT_DLI_SRC_HEADNO) TYPE  /1BEA/RT_CRMB_SRC_HEADNO
+*"         OPTIONAL
+*"     REFERENCE(IRT_DLI_SRC_ITEMNO) TYPE  /1BEA/RT_CRMB_SRC_ITEMNO
+*"         OPTIONAL
+*"     REFERENCE(IRT_DLI_SRC_USER) TYPE  /1BEA/RT_CRMB_SRC_USER
+*"         OPTIONAL
+*"     REFERENCE(IRT_DLI_SRVDOC_SOURCE) TYPE  BEART_SRVDOC_SOURCE
+*"         OPTIONAL
+*"     REFERENCE(IRT_DLI_TERMS_OF_PAYMENT) TYPE
+*"                             BEART_TERMS_OF_PAYMENT OPTIONAL
+*"     REFERENCE(IT_WHERE_CONDITION) TYPE  COMT_WHERE_CONDITION_TAB
+*"         OPTIONAL
+*"     REFERENCE(IV_MAXROWS) TYPE  BAPIMAXROW
+*"         DEFAULT                    0
+*"     REFERENCE(IV_THRESHOLD) TYPE  I DEFAULT                    0
+*"     REFERENCE(IV_SHOW_UI_MESSAGES) TYPE  BEA_BOOLEAN OPTIONAL
+*"     REFERENCE(IV_DLH_GUID) TYPE  BEA_DLI_GUID OPTIONAL
+*"  EXPORTING
+*"     REFERENCE(ET_DLH_GUID) TYPE  BEAT_DLI_GUID
+*"     REFERENCE(ET_DLI_WRK) TYPE  /1BEA/T_CRMB_DLI_WRK
+*"     REFERENCE(EV_DLH_MODIFIED) TYPE  BEA_BOOLEAN
+*"     REFERENCE(ET_RETURN) TYPE  BEAT_RETURN
+*"--------------------------------------------------------------------
+*======================================================================
+*
+* The following coding has been generated. Please do not change
+* manually. All modifications will be lost by new generation.
+*
+* The code generation was triggered by
+*
+* Name  : DDIC
+* Date  : 03.05.2012
+* Time  : 13:53:10
+*
+*======================================================================
+TYPES:
+  BEGIN OF LSY_OBJECT_KEY,
+    DLI_GUID      TYPE BEA_DLI_GUID_C,
+         DERIV_CATEGORY   TYPE /1BEA/US_CRMB_DL_DLI_SRCDLHD-DERIV_CATEGORY,
+         LOGSYS   TYPE /1BEA/US_CRMB_DL_DLI_SRCDLHD-LOGSYS,
+         OBJTYPE   TYPE /1BEA/US_CRMB_DL_DLI_SRCDLHD-OBJTYPE,
+         SRC_HEADNO   TYPE /1BEA/US_CRMB_DL_DLI_SRCDLHD-SRC_HEADNO,
+  END OF LSY_OBJECT_KEY.
+
+DATA: LT_RETURN              TYPE BEAT_RETURN,
+      LT_DLI                 TYPE /1BEA/T_CRMB_DLI_WRK,
+      LT_DLH                 TYPE /1BEA/T_CRMB_DLI_WRK,
+      LV_NR_OF_ENTRIES       TYPE BEA_NR_OF_ENTRIES VALUE 100,
+      LS_DLI_DSP             TYPE /1BEA/S_CRMB_DLI_DSP,
+      LS_DLH_DSP             TYPE /1BEA/S_CRMB_DLI_DSP,
+      LS_OBJECT_KEY          TYPE LSY_OBJECT_KEY,
+      LT_DLH_OBJECT_KEY      TYPE CRMT_BSP_OBJECTKEY_TAB,
+      LS_DLI_WRK             LIKE LINE OF GT_DLI_WRK,
+      LV_LINES_DLH           TYPE I,
+      LV_LINES_DLI           TYPE I.
+
+
+
+FIELD-SYMBOLS:
+              "<DLI_DSP> TYPE /1BEA/S_CRMB_DLI_DSP,
+               <LS_DLI>  TYPE /1BEA/S_CRMB_DLI_WRK,
+               <DLI_WRK> TYPE /1BEA/S_CRMB_DLI_WRK.
+
+
+ LV_NR_OF_ENTRIES = IV_MAXROWS + iv_threshold.
+ CALL FUNCTION '/1BEA/CRMB_DL_O_GETLIST'
+      EXPORTING
+          IV_AUTH_CHECK_DLI         = IV_AUTH_CHECK_DLI
+          IV_AUTH_CHECK_BDH         = IV_AUTH_CHECK_BDH
+          IV_SORTREL                = GC_SORT_BY_PRIMARY_KEY
+          IRT_BDI_GUID            = IRT_DLI_BDI_GUID
+          IRT_BILL_BLOCK            = IRT_DLI_BILL_BLOCK
+          IRT_BILL_CATEGORY            = IRT_DLI_BILL_CATEGORY
+          IRT_BILL_DATE            = IRT_DLI_BILL_DATE
+          IRT_BILL_ORG            = IRT_DLI_BILL_ORG
+          IRT_BILL_RELEVANCE            = IRT_DLI_BILL_RELEVANCE
+          IRT_BILL_STATUS            = IRT_DLI_BILL_STATUS
+          IRT_BILL_TYPE            = IRT_DLI_BILL_TYPE
+          IRT_CREDIT_DEBIT            = IRT_DLI_CREDIT_DEBIT
+          IRT_DERIV_CATEGORY            = IRT_DLI_DERIV_CATEGORY
+          IRT_DLI_GUID            = IRT_DLI_DLI_GUID
+          IRT_INCOMP_ID            = IRT_DLI_INCOMP_ID
+          IRT_INVCR_DATE            = IRT_DLI_INVCR_DATE
+          IRT_ITEM_CATEGORY            = IRT_DLI_ITEM_CATEGORY
+          IRT_ITEM_TYPE            = IRT_DLI_ITEM_TYPE
+          IRT_LOGSYS            = IRT_DLI_LOGSYS
+          IRT_MAINT_DATE            = IRT_DLI_MAINT_DATE
+          IRT_MAINT_TIME            = IRT_DLI_MAINT_TIME
+          IRT_MAINT_USER            = IRT_DLI_MAINT_USER
+          IRT_OBJTYPE            = IRT_DLI_OBJTYPE
+          IRT_PAYER            = IRT_DLI_PAYER
+          IRT_P_LOGSYS            = IRT_DLI_P_LOGSYS
+          IRT_P_OBJTYPE            = IRT_DLI_P_OBJTYPE
+          IRT_P_SRC_HEADNO            = IRT_DLI_P_SRC_HEADNO
+          IRT_SOLD_TO_PARTY            = IRT_DLI_SOLD_TO_PARTY
+          IRT_SRC_DATE            = IRT_DLI_SRC_DATE
+          IRT_SRC_GUID            = IRT_DLI_SRC_GUID
+          IRT_SRC_HEADNO            = IRT_DLI_SRC_HEADNO
+          IRT_SRC_ITEMNO            = IRT_DLI_SRC_ITEMNO
+          IRT_SRC_USER            = IRT_DLI_SRC_USER
+          IRT_SRVDOC_SOURCE            = IRT_DLI_SRVDOC_SOURCE
+          IRT_TERMS_OF_PAYMENT            = IRT_DLI_TERMS_OF_PAYMENT
+          IT_WHERE_CONDITION = IT_WHERE_CONDITION
+          IV_MAXROWS         = LV_NR_OF_ENTRIES
+      IMPORTING
+          ET_DLI      = LT_DLI.
+ IF LT_DLI IS INITIAL.
+   MESSAGE S130(BEA)
+           INTO GV_DUMMY.
+    CALL FUNCTION '/1BEA/CRMB_DL_O_MESSAGE_ADD'
+      EXPORTING
+        IV_OBJECT      = 'DL'
+        IV_CONTAINER   = 'DLI'
+      IMPORTING
+        ET_RETURN      = LT_RETURN.
+    append lines of lt_return to et_return.
+   EXIT.
+ ELSE.
+
+   IF iv_threshold IS NOT INITIAL AND iv_show_ui_messages IS NOT INITIAL.
+     DESCRIBE TABLE LT_DLI LINES lv_lines_dli.
+     IF lv_lines_dli > IV_MAXROWS.
+       MESSAGE S001(BEA_DL_UIU) WITH IV_MAXROWS
+               INTO GV_DUMMY.
+       CALL FUNCTION '/1BEA/CRMB_DL_O_MESSAGE_ADD'
+          EXPORTING
+            IV_OBJECT      = 'DL'
+            IV_CONTAINER   = 'DLI'
+          IMPORTING
+            ET_RETURN      = LT_RETURN.
+       append lines of lt_return to et_return.
+       DELETE LT_DLI INDEX LV_NR_OF_ENTRIES.
+     ENDIF.
+   ENDIF.
+
+   DELETE LT_DLI
+          WHERE INCOMP_ID      EQ GC_INCOMP_OK            AND
+                BILL_TYPE      EQ SPACE                   AND
+              ( BILL_RELEVANCE EQ GC_BILL_REL_DELIVERY OR
+                BILL_RELEVANCE EQ GC_BILL_REL_DELIV_IC OR
+                BILL_RELEVANCE EQ GC_BILL_REL_DLV_TPOP ).
+   IF SY-SUBRC = 0 AND iv_show_ui_messages IS NOT INITIAL.
+     MESSAGE i173(bea) INTO  GV_DUMMY.
+     CLEAR lt_return.
+     CALL FUNCTION '/1BEA/CRMB_DL_O_MESSAGE_ADD'
+       EXPORTING
+         IV_OBJECT      = 'DL'
+         IV_CONTAINER   = 'DLI'
+       IMPORTING
+         ET_RETURN      = LT_RETURN.
+     append lines of lt_return to et_return.
+   ENDIF.
+ ENDIF.
+
+ SORT LT_DLI BY BILL_TYPE DESCENDING.
+
+ CALL FUNCTION '/1BEA/CRMB_DL_O_BUILD_DOCVIEW'
+   EXPORTING
+     IT_DLI           =  LT_DLI
+     IV_HEAD_DL       =  GC_TRUE
+     IV_MAXROWS       =  IV_MAXROWS
+   IMPORTING
+     ET_DLI           =  LT_DLI
+     ET_DLH           =  LT_DLH.
+
+ IF iv_show_ui_messages IS NOT INITIAL.
+   DESCRIBE TABLE LT_DLI LINES lv_lines_dli.
+   DESCRIBE TABLE LT_DLH LINES lv_lines_dlh.
+   IF lv_lines_dlh <> lv_lines_dli.
+     MESSAGE I005(BEA_DL_UIU) WITH lv_lines_dli lv_lines_dlh
+               INTO GV_DUMMY.
+     CALL FUNCTION '/1BEA/CRMB_DL_O_MESSAGE_ADD'
+        EXPORTING
+          IV_OBJECT      = 'DL'
+          IV_CONTAINER   = 'DLI'
+        IMPORTING
+          ET_RETURN      = LT_RETURN.
+     append lines of lt_return to et_return.
+   ENDIF.
+ ENDIF.
+
+
+ LOOP AT LT_DLH ASSIGNING <DLI_WRK>.
+   IF iv_dlh_guid IS INITIAL.
+     CALL FUNCTION 'GUID_CREATE'
+       IMPORTING
+         ev_guid_16 = <DLI_WRK>-DLI_GUID.
+   ELSE.
+     <DLI_WRK>-DLI_GUID = iv_dlh_guid.
+   ENDIF.
+   APPEND <DLI_WRK>-DLI_GUID TO ET_DLH_GUID.
+
+   LOOP AT LT_DLI ASSIGNING <LS_DLI>
+     WHERE
+          DERIV_CATEGORY  = <DLI_WRK>-DERIV_CATEGORY
+         AND LOGSYS  = <DLI_WRK>-LOGSYS
+         AND OBJTYPE  = <DLI_WRK>-OBJTYPE
+         AND SRC_HEADNO  = <DLI_WRK>-SRC_HEADNO.
+
+       IF <DLI_WRK>-BILL_STATUS IS INITIAL.
+*         take over BILL_STATUS of first item
+         MOVE <LS_DLI>-BILL_STATUS TO <DLI_WRK>-BILL_STATUS.
+       ENDIF.
+       IF <LS_DLI>-BILL_STATUS <> <DLI_WRK>-BILL_STATUS.
+*       In case, the bill status on item level is not unique
+         <DLI_WRK>-BILL_STATUS = GC_BILLSTAT_TODO.
+       ENDIF.
+       IF <LS_DLI>-BILL_BLOCK  <> GC_BILLBLOCK_NONE OR
+          <LS_DLI>-INCOMP_ID   <> GC_INCOMP_OK.
+*         If any item is blocked or incomplete, status is red
+         <DLI_WRK>-BILL_STATUS = GC_BILLSTAT_NO.
+         EXIT.
+       ENDIF.
+   ENDLOOP.
+
+   IF iv_dlh_guid IS INITIAL.
+     INSERT <DLI_WRK> INTO TABLE GT_DLH_WRK.
+   ELSE.
+     MODIFY TABLE GT_DLH_WRK FROM <DLI_WRK>.
+     EV_DLH_MODIFIED = GC_TRUE.
+   ENDIF.
+ ENDLOOP.
+
+ LOOP AT LT_DLI ASSIGNING <DLI_WRK>.
+*  Insert the records sorted by DLI_GUID
+   IF GT_DLI_WRK IS INITIAL.
+     INSERT <DLI_WRK> INTO TABLE GT_DLI_WRK.
+   ELSE.
+     READ TABLE GT_DLI_WRK INTO LS_DLI_WRK
+          WITH KEY DLI_GUID = <DLI_WRK>-DLI_GUID BINARY SEARCH.
+     IF SY-SUBRC NE 0.
+       IF SY-TABIX = 0.
+         INSERT <DLI_WRK> INTO GT_DLI_WRK INDEX 1.
+       ELSE.
+         INSERT <DLI_WRK> INTO GT_DLI_WRK INDEX SY-TABIX.
+       ENDIF.
+     ENDIF.
+   ENDIF.
+ ENDLOOP.
+
+  IF ET_DLI_WRK IS REQUESTED.
+    ET_DLI_WRK = LT_DLI.
+  ENDIF.
+ENDFUNCTION.

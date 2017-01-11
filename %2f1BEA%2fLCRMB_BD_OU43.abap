@@ -1,0 +1,153 @@
+FUNCTION /1BEA/CRMB_BD_O_CHECK_CORRABL.
+*"--------------------------------------------------------------------
+*"*"Local Interface:
+*"  IMPORTING
+*"     REFERENCE(IS_BDI) TYPE  /1BEA/S_CRMB_BDI_WRK
+*"     REFERENCE(IS_DLI) TYPE  /1BEA/S_CRMB_DLI_WRK OPTIONAL
+*"  EXCEPTIONS
+*"      NOT_ALLOWED
+*"      INCONSISTENT_DATA
+*"--------------------------------------------------------------------
+*======================================================================
+*
+* The following coding has been generated. Please do not change
+* manually. All modifications will be lost by new generation.
+*
+* The code generation was triggered by
+*
+* Name  : DDIC
+* Date  : 03.05.2012
+* Time  : 13:52:50
+*
+*======================================================================
+* Check for validity:
+* - not cancelled
+* - no cancellation or correction
+* - if corrected, only allowed if correction request rejected
+
+DATA:
+  LRS_DLI_LOGSYS TYPE /1BEA/RS_CRMB_LOGSYS,
+  LRT_DLI_LOGSYS TYPE /1BEA/RT_CRMB_LOGSYS,
+  LRS_DLI_OBJTYPE TYPE /1BEA/RS_CRMB_OBJTYPE,
+  LRT_DLI_OBJTYPE TYPE /1BEA/RT_CRMB_OBJTYPE,
+  LRS_DLI_SRC_HEADNO TYPE /1BEA/RS_CRMB_SRC_HEADNO,
+  LRT_DLI_SRC_HEADNO TYPE /1BEA/RT_CRMB_SRC_HEADNO,
+  LRS_DLI_SRC_ITEMNO TYPE /1BEA/RS_CRMB_SRC_ITEMNO,
+  LRT_DLI_SRC_ITEMNO TYPE /1BEA/RT_CRMB_SRC_ITEMNO,
+  LS_BDI_WRK     TYPE /1BEA/S_CRMB_BDI_WRK,
+  LT_BDI_WRK     TYPE /1BEA/T_CRMB_BDI_WRK,
+  LS_BDH_WRK     TYPE /1BEA/S_CRMB_BDH_WRK,
+  LRS_BDH_GUID   TYPE BEARS_BDH_GUID,
+  LRT_BDH_GUID   TYPE BEART_BDH_GUID,
+  LRS_ITEMNO_EXT TYPE BEARS_ITEMNO_EXT,
+  LRT_ITEMNO_EXT TYPE BEART_ITEMNO_EXT,
+  LT_DLI_WRK     TYPE /1BEA/T_CRMB_DLI_WRK,
+  LS_DLI_WRK     TYPE /1BEA/S_CRMB_DLI_WRK.
+
+
+  IF IS_BDI-IS_REVERSED = GC_IS_REVED_BY_CANC OR NOT IS_BDI-REVERSAL IS INITIAL.
+    IF LS_BDH_WRK IS INITIAL.
+      CALL FUNCTION '/1BEA/CRMB_BD_O_BDHGETDTL'
+        EXPORTING
+          IV_BDH_GUID = IS_BDI-BDH_GUID
+        IMPORTING
+          ES_BDH      = LS_BDH_WRK
+        EXCEPTIONS
+          NOTFOUND    = 0
+          OTHERS      = 0.
+    ENDIF.
+    MESSAGE E218(BEA) WITH LS_BDH_WRK-HEADNO_EXT IS_BDI-ITEMNO_EXT
+                      RAISING NOT_ALLOWED.
+  ENDIF.
+  IF IS_BDI-IS_REVERSED = GC_IS_REVED_BY_CORR.
+*     Correction request might have been rejected which would be ok
+    CALL FUNCTION '/1BEA/CRMB_DL_O_DOCFL_REV_GET'
+      EXPORTING
+        IS_BDI        = IS_BDI
+      IMPORTING
+        ES_BDI        = LS_BDI_WRK
+      EXCEPTIONS
+        REJECT        = 1
+        OTHERS        = 2.
+    IF SY-SUBRC <> 0.
+      MESSAGE ID SY-MSGID TYPE SY-MSGTY NUMBER SY-MSGNO
+              WITH SY-MSGV1 SY-MSGV2 SY-MSGV3 SY-MSGV4
+              RAISING INCONSISTENT_DATA.
+    ELSE.
+      CLEAR LT_BDI_WRK.
+      LRS_BDH_GUID-SIGN   = GC_INCLUDE.
+      LRS_BDH_GUID-OPTION = GC_RANGEOPTION_EQ.
+      LRS_BDH_GUID-LOW    = LS_BDI_WRK-BDH_GUID.
+      APPEND LRS_BDH_GUID TO LRT_BDH_GUID.
+      LRS_ITEMNO_EXT-SIGN   = GC_INCLUDE.
+      LRS_ITEMNO_EXT-OPTION = GC_RANGEOPTION_EQ.
+      LRS_ITEMNO_EXT-LOW    = LS_BDI_WRK-PARENT_ITEMNO.
+      APPEND LRS_ITEMNO_EXT TO LRT_ITEMNO_EXT.
+      CALL FUNCTION '/1BEA/CRMB_BD_O_BDIGETLIST'
+        EXPORTING
+          IRT_BDH_GUID   = LRT_BDH_GUID
+          IRT_ITEMNO_EXT = LRT_ITEMNO_EXT
+        IMPORTING
+          ET_BDI         = LT_BDI_WRK.
+      IF LT_BDI_WRK IS INITIAL.
+        CALL FUNCTION '/1BEA/CRMB_BD_O_BDHGETDTL'
+          EXPORTING
+            IV_BDH_GUID = IS_BDI-BDH_GUID
+          IMPORTING
+            ES_BDH      = LS_BDH_WRK
+          EXCEPTIONS
+            NOTFOUND    = 0
+            OTHERS      = 0.
+        MESSAGE E120(BEA) WITH LS_BDH_WRK-HEADNO_EXT IS_BDI-ITEMNO_EXT
+                          RAISING INCONSISTENT_DATA.
+      ENDIF.
+      READ TABLE LT_BDI_WRK INTO LS_BDI_WRK INDEX 1. " only one super item can exist
+      LRS_DLI_LOGSYS-SIGN    = GC_INCLUDE.
+      LRS_DLI_LOGSYS-OPTION  = GC_EQUAL.
+      LRS_DLI_LOGSYS-LOW     = LS_BDI_WRK-LOGSYS.
+      APPEND LRS_DLI_LOGSYS TO LRT_DLI_LOGSYS.
+      LRS_DLI_OBJTYPE-SIGN    = GC_INCLUDE.
+      LRS_DLI_OBJTYPE-OPTION  = GC_EQUAL.
+      LRS_DLI_OBJTYPE-LOW     = LS_BDI_WRK-OBJTYPE.
+      APPEND LRS_DLI_OBJTYPE TO LRT_DLI_OBJTYPE.
+      LRS_DLI_SRC_HEADNO-SIGN    = GC_INCLUDE.
+      LRS_DLI_SRC_HEADNO-OPTION  = GC_EQUAL.
+      LRS_DLI_SRC_HEADNO-LOW     = LS_BDI_WRK-SRC_HEADNO.
+      APPEND LRS_DLI_SRC_HEADNO TO LRT_DLI_SRC_HEADNO.
+      LRS_DLI_SRC_ITEMNO-SIGN    = GC_INCLUDE.
+      LRS_DLI_SRC_ITEMNO-OPTION  = GC_EQUAL.
+      LRS_DLI_SRC_ITEMNO-LOW     = LS_BDI_WRK-SRC_ITEMNO.
+      APPEND LRS_DLI_SRC_ITEMNO TO LRT_DLI_SRC_ITEMNO.
+      CALL FUNCTION '/1BEA/CRMB_DL_O_GETLIST'
+        EXPORTING
+          IRT_LOGSYS = LRT_DLI_LOGSYS
+          IRT_OBJTYPE = LRT_DLI_OBJTYPE
+          IRT_SRC_HEADNO = LRT_DLI_SRC_HEADNO
+          IRT_SRC_ITEMNO = LRT_DLI_SRC_ITEMNO
+        IMPORTING
+          ET_DLI            = LT_DLI_WRK.
+       CALL FUNCTION '/1BEA/CRMB_DL_O_GET_CHANGEABL'
+         EXPORTING
+           IT_DLI           = LT_DLI_WRK
+         IMPORTING
+           ET_DLI_OV        = LT_DLI_WRK
+         EXCEPTIONS
+           REJECT           = 0
+           OTHERS           = 0.
+      READ TABLE LT_DLI_WRK WITH KEY DLI_GUID = IS_DLI-DLI_GUID
+                            TRANSPORTING NO FIELDS.
+      IF SY-SUBRC <> 0.
+        CALL FUNCTION '/1BEA/CRMB_BD_O_BDHGETDTL'
+          EXPORTING
+            IV_BDH_GUID = IS_BDI-BDH_GUID
+          IMPORTING
+            ES_BDH      = LS_BDH_WRK
+          EXCEPTIONS
+            NOTFOUND    = 0
+            OTHERS      = 0.
+        MESSAGE E218(BEA) WITH LS_BDH_WRK-HEADNO_EXT IS_BDI-ITEMNO_EXT
+                          RAISING NOT_ALLOWED.
+      ENDIF.
+    ENDIF.
+  ENDIF.
+ENDFUNCTION.

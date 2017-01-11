@@ -1,0 +1,92 @@
+FUNCTION-POOL /1BEA/CRMB_DL_O.              "MESSAGE-ID ..
+*======================================================================
+*
+* The following coding has been generated. Please do not change
+* manually. All modifications will be lost by new generation.
+*
+* The code generation was triggered by
+*
+* Name  : DDIC
+* Date  : 03.05.2012
+* Time  : 13:53:10
+*
+*======================================================================
+
+CONSTANTS:
+  GC_APPL             TYPE  BEF_APPL
+                      VALUE 'CRMB',
+  GC_EXIT_DFL_DATA    TYPE EXIT_DEF
+                      VALUE 'BEA_DOCFLOW_DATA'.
+
+INCLUDE:
+  BEA_BASICS,
+  CRM_OBJECT_TYPES_CON.
+
+ DATA:
+   GT_DLI_WRK TYPE /1BEA/T_CRMB_DLI_WRK,
+   GT_DLI_HLP TYPE /1BEA/T_CRMB_DLI_WRK,
+   GS_DLI_HLP TYPE /1BEA/S_CRMB_DLI_WRK.
+
+DATA:
+   GS_DLI_DGB      TYPE /1BEA/S_CRMB_DLI_WRK,
+   GT_DLI_DGB      TYPE /1BEA/T_CRMB_DLI_WRK.
+
+DATA:
+  GT_LOGHNDL       TYPE BAL_T_LOGH,
+  GT_BALHDR_DEL    TYPE BALHDR_T,
+  GO_DFL_DATA      TYPE REF TO IF_EX_BEA_DOCFLOW_DATA,
+  GT_DLI_DOC       TYPE /1BEA/T_CRMB_DLI_WRK,
+  GV_DRV_LOG       TYPE BEA_BOOLEAN,
+  GV_MAX_DOCUMENTS TYPE SYTABIX VALUE 1000,
+  LV_SGPB          TYPE SYTABIX,
+  LV_SGPBC(4).
+
+DATA:
+  GS_SRC_HID     TYPE /1BEA/US_CRMB_DL_DLI_SRC_HID,
+  GT_SRCDLHD_ENQ TYPE SORTED TABLE OF
+  /1BEA/US_CRMB_DL_DLI_SRCDLHD
+                 WITH UNIQUE KEY TABLE_LINE.
+DATA:
+  GT_DG_ID_ENQ TYPE SORTED TABLE OF
+  /1BEA/US_CRMB_DL_DLI_DG_ID
+                 WITH UNIQUE KEY TABLE_LINE.
+
+TYPES:
+  BEGIN OF TY_ENQUEUE_DLI,
+    DERIV_CATEGORY        TYPE /1BEA/E_CRMB_DLI-DERIV_CATEGORY,
+    X_DERIV_CATEGORY      TYPE BEA_BOOLEAN,
+    LOGSYS        TYPE /1BEA/E_CRMB_DLI-LOGSYS,
+    X_LOGSYS      TYPE BEA_BOOLEAN,
+    OBJTYPE        TYPE /1BEA/E_CRMB_DLI-OBJTYPE,
+    X_OBJTYPE      TYPE BEA_BOOLEAN,
+    SRC_HEADNO        TYPE /1BEA/E_CRMB_DLI-SRC_HEADNO,
+    X_SRC_HEADNO      TYPE BEA_BOOLEAN,
+    SRC_ITEMNO        TYPE /1BEA/E_CRMB_DLI-SRC_ITEMNO,
+    X_SRC_ITEMNO      TYPE BEA_BOOLEAN,
+  END OF   TY_ENQUEUE_DLI.
+DATA:
+   GT_ENQUEUE_DLI      TYPE TABLE OF TY_ENQUEUE_DLI.
+
+DATA:
+  GT_DLH_WRK TYPE HASHED TABLE OF /1BEA/S_CRMB_DLI_WRK
+                WITH UNIQUE KEY DLI_GUID,
+  GS_DLH_WRK TYPE /1BEA/S_CRMB_DLI_WRK.
+
+* Event DL_OTOP
+  INCLUDE %2f1BEA%2fX_CRMBDL_OTOP_0INC_F1CON.
+  INCLUDE %2f1BEA%2fX_CRMBDL_OTOP_DRVODL_TOP.
+  INCLUDE BETX_PARODL_TOP.
+*********************************************************************
+* EVENT LOAD-OF-PROGRAM
+*********************************************************************
+ LOAD-OF-PROGRAM.
+   GET PARAMETER ID 'COLL_RUN_BLOCKSIZE' FIELD LV_SGPBC.
+   GET PARAMETER ID 'BEA_DRV_LOG' FIELD GV_DRV_LOG.
+   CATCH SYSTEM-EXCEPTIONS CONVERSION_ERRORS = 1.
+     MOVE LV_SGPBC TO LV_SGPB.
+   ENDCATCH.
+   IF SY-SUBRC IS INITIAL.
+     IF LV_SGPB > 0.
+       GV_MAX_DOCUMENTS = LV_SGPB.
+     ENDIF.
+   ENDIF.

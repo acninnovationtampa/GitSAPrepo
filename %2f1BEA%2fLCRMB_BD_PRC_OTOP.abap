@@ -1,0 +1,77 @@
+FUNCTION-POOL /1BEA/CRMB_BD_PRC_O.          "MESSAGE-ID ..
+*======================================================================
+*
+* The following coding has been generated. Please do not change
+* manually. All modifications will be lost by new generation.
+*
+* The code generation was triggered by
+*
+* Name  : DDIC
+* Date  : 03.05.2012
+* Time  : 13:53:02
+*
+*======================================================================
+INCLUDE BEA_BASICS.
+INCLUDE BEA_PRC_CON.
+INCLUDE BEA_CON_R1.
+
+TYPES:
+  BEGIN OF TY_PD2ITEMNO,
+    PRIDOC_GUID TYPE PRCT_PRIDOC_GUID,
+    ITEM_NO     TYPE PRCT_ITEM_NO,
+    ITEM_NO_NEW TYPE PRCT_ITEM_NO,
+  END   OF TY_PD2ITEMNO.
+
+DATA:
+  GV_MAPPING_EXIT TYPE REF TO BEA_CRMB_BD_PRC,
+  GV_PRC_LOGHNDL  TYPE BALLOGHNDL.
+DATA:
+  GT_HEAD_ATTR_NAMES TYPE PRCT_ATTR_NAME_T,
+  GT_ITEM_ATTR_NAMES TYPE PRCT_ATTR_NAME_T,
+  GT_TIMESTAMP_NAMES TYPE PRCT_ATTR_NAME_T,
+  GT_ALL_ATTR_NAMES  TYPE PRCT_ATTR_NAME_T.
+
+DEFINE PRC_LOG_INIT.
+  DATA LS_LOG TYPE BAL_S_LOG.
+  LS_LOG-EXTNUMBER = 'PRC'.
+  LS_LOG-OBJECT    = 'BEA'.
+  LS_LOG-SUBOBJECT = 'PRC'.
+  CALL FUNCTION 'BAL_LOG_CREATE'
+    EXPORTING
+       I_S_LOG      = LS_LOG
+    IMPORTING
+      E_LOG_HANDLE  = GV_PRC_LOGHNDL
+    EXCEPTIONS
+      OTHERS        = 0.
+END-OF-DEFINITION.
+DEFINE PRC_LOG_CLEAR.
+  IF NOT GV_PRC_LOGHNDL IS INITIAL.
+    CALL FUNCTION 'BAL_LOG_MSG_DELETE_ALL'
+      EXPORTING
+        I_LOG_HANDLE = GV_PRC_LOGHNDL
+      EXCEPTIONS
+        OTHERS       = 0.
+  ENDIF.
+END-OF-DEFINITION.
+
+DEFINE PRC_SET_ERROR.
+  IF &1 IS INITIAL.
+    &1 = &2.
+  ENDIF.
+END-OF-DEFINITION.
+DEFINE PRC_SET_STATUS.
+  IF &2 NE GC_PRC_STAT_NOTREL AND &2 NE GC_PRC_STAT_INTERR.
+    &2 = &1.
+  ENDIF.
+  IF &1 NE GC_PRC_STAT_NOTREL AND
+    NOT &1 IS INITIAL         AND
+    NOT &3 EQ GC_PRC_ERR_F.
+      &3 = GC_PRC_ERR_X.
+  ENDIF.
+END-OF-DEFINITION.
+
+LOAD-OF-PROGRAM.
+  TRY.
+    GET BADI GV_MAPPING_EXIT.
+    catch cx_badi_not_implemented.
+  ENDTRY.
